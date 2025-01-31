@@ -1,4 +1,3 @@
-// Configuración básica del script
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('loginForm');
   const messageBox = document.getElementById('messageBox');
@@ -9,15 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearMessageButton = document.getElementById('clearMessage');
   const messagesList = document.getElementById('messagesList');
 
-  // Simulador de credenciales (debe ser reemplazado por autenticación segura)
   const validCredentials = [
     { username: "Tony", password: "0102" },
     { username: "Tiff", password: "0102" },
   ];
 
-  let messages = []; // Almacena los mensajes enviados
+  let messages = [];
 
-  // Verificar las credenciales de acceso
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -29,59 +26,38 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     if (isValidUser) {
-      // Animación para cambiar de pantalla
-      gsap.to(loginForm, { duration: 0.5, opacity: 0, y: -20 });
+      gsap.to(loginForm, { duration: 0.5, opacity: 0, y: -50 });
       setTimeout(() => {
         loginForm.classList.add('hidden');
         messageBox.classList.remove('hidden');
-        gsap.fromTo(
-          messageBox,
-          { opacity: 0, y: 20 },
-          { duration: 0.5, opacity: 1, y: 0 }
-        );
+        gsap.fromTo(messageBox, { opacity: 0, y: 50 }, { opacity: 1, y: 0 });
       }, 500);
     } else {
-      alert("Usuario o contraseña incorrectos. Inténtalo de nuevo.");
+      alert("Usuario o contraseña incorrectos");
     }
   });
 
-  // Enviar mensaje
   sendMessageButton.addEventListener('click', () => {
     const message = messageInput.value.trim();
-
     if (message) {
-      messages.push(message);
-      updateMessagesList();
-      messageInput.value = ''; // Limpiar el campo de texto
-    } else {
-      alert("El mensaje no puede estar vacío.");
+      messages.push({ content: message, sender: "You" });
+      updateMessages();
+      messageInput.value = '';
     }
   });
 
-  // Borrar el mensaje actual
   clearMessageButton.addEventListener('click', () => {
     messageInput.value = '';
   });
 
-  // Actualizar la lista de mensajes
-  function updateMessagesList() {
-    messagesList.innerHTML = ''; // Limpiar la lista
-    messages.forEach((msg, index) => {
-      const li = document.createElement('li');
-      li.textContent = msg;
-      li.className = 'message-item';
-
-      // Agregar botón de eliminar mensaje
-      const deleteButton = document.createElement('button');
-      deleteButton.textContent = 'Eliminar';
-      deleteButton.className = 'delete-button';
-      deleteButton.addEventListener('click', () => {
-        messages.splice(index, 1); // Eliminar mensaje
-        updateMessagesList();
-      });
-
-      li.appendChild(deleteButton);
-      messagesList.appendChild(li);
+  function updateMessages() {
+    messagesList.innerHTML = '';
+    messages.forEach((msg) => {
+      const div = document.createElement('div');
+      div.className = `message-item ${msg.sender === "You" ? "sender" : ""}`;
+      div.textContent = msg.content;
+      messagesList.appendChild(div);
     });
+    messagesList.scrollTop = messagesList.scrollHeight;
   }
 });
