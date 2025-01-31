@@ -1,75 +1,87 @@
-// Credenciales permitidas
-const validCredentials = [
+// Configuración básica del script
+document.addEventListener('DOMContentLoaded', () => {
+  const loginForm = document.getElementById('loginForm');
+  const messageBox = document.getElementById('messageBox');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+  const messageInput = document.getElementById('messageInput');
+  const sendMessageButton = document.getElementById('sendMessage');
+  const clearMessageButton = document.getElementById('clearMessage');
+  const messagesList = document.getElementById('messagesList');
+
+  // Simulador de credenciales (debe ser reemplazado por autenticación segura)
+  const validCredentials = [
     { username: "Tony", password: "0102" },
-    { username: "Tiff", password: "0102" }
+    { username: "Tiff", password: "0102" },
   ];
-  
-  // Variables
-  const loginScreen = document.querySelector(".login-screen");
-  const messageScreen = document.querySelector(".message-screen");
-  const loginButton = document.getElementById("login-button");
-  const errorMessage = document.getElementById("error-message");
-  const messageInput = document.getElementById("message-input");
-  const sendButton = document.getElementById("send-button");
-  const clearButton = document.getElementById("clear-button");
-  const messagesContainer = document.getElementById("messages-container");
-  
-  // Horarios
-  const startHour = 23; // 11 PM
-  const startMinute = 11;
-  const endHour = 11; // 11 AM
-  const endMinute = 11;
-  
-  // Función para verificar horario
-  function isWithinSchedule() {
-    const now = new Date();
-    const peruTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Lima" }));
-    const hours = peruTime.getHours();
-    const minutes = peruTime.getMinutes();
-  
-    if (
-      (hours > startHour || (hours === startHour && minutes >= startMinute)) ||
-      (hours < endHour || (hours === endHour && minutes <= endMinute))
-    ) {
-      return true;
-    }
-    return false;
-  }
-  
-  // Login
-  loginButton.addEventListener("click", () => {
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-  
-    const isValid = validCredentials.some(
-      (cred) => cred.username === username && cred.password === password
+
+  let messages = []; // Almacena los mensajes enviados
+
+  // Verificar las credenciales de acceso
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+
+    const isValidUser = validCredentials.some(
+      (user) => user.username === username && user.password === password
     );
-  
-    if (!isValid) {
-      errorMessage.classList.remove("hidden");
-    } else if (!isWithinSchedule()) {
-      alert("Esta página solo está disponible los domingos de 11:11 PM a 11:11 AM.");
+
+    if (isValidUser) {
+      // Animación para cambiar de pantalla
+      gsap.to(loginForm, { duration: 0.5, opacity: 0, y: -20 });
+      setTimeout(() => {
+        loginForm.classList.add('hidden');
+        messageBox.classList.remove('hidden');
+        gsap.fromTo(
+          messageBox,
+          { opacity: 0, y: 20 },
+          { duration: 0.5, opacity: 1, y: 0 }
+        );
+      }, 500);
     } else {
-      loginScreen.classList.add("hidden");
-      messageScreen.classList.remove("hidden");
+      alert("Usuario o contraseña incorrectos. Inténtalo de nuevo.");
     }
   });
-  
+
   // Enviar mensaje
-  sendButton.addEventListener("click", () => {
-    const messageText = messageInput.value;
-    if (messageText.trim() === "") return;
-  
-    const messageElement = document.createElement("div");
-    messageElement.className = "message";
-    messageElement.textContent = messageText;
-  
-    messagesContainer.appendChild(messageElement);
-    messageInput.value = "";
+  sendMessageButton.addEventListener('click', () => {
+    const message = messageInput.value.trim();
+
+    if (message) {
+      messages.push(message);
+      updateMessagesList();
+      messageInput.value = ''; // Limpiar el campo de texto
+    } else {
+      alert("El mensaje no puede estar vacío.");
+    }
   });
-  
-  // Eliminar texto
-  clearButton.addEventListener("click", () => {
-    messageInput.value = "";
+
+  // Borrar el mensaje actual
+  clearMessageButton.addEventListener('click', () => {
+    messageInput.value = '';
   });
-  
+
+  // Actualizar la lista de mensajes
+  function updateMessagesList() {
+    messagesList.innerHTML = ''; // Limpiar la lista
+    messages.forEach((msg, index) => {
+      const li = document.createElement('li');
+      li.textContent = msg;
+      li.className = 'message-item';
+
+      // Agregar botón de eliminar mensaje
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'Eliminar';
+      deleteButton.className = 'delete-button';
+      deleteButton.addEventListener('click', () => {
+        messages.splice(index, 1); // Eliminar mensaje
+        updateMessagesList();
+      });
+
+      li.appendChild(deleteButton);
+      messagesList.appendChild(li);
+    });
+  }
+});
