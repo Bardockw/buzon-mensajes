@@ -10,16 +10,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearMessageButton = document.getElementById('clearMessage');
   const messagesList = document.getElementById('messagesList');
 
-  const validUsers = ["Tony", "Tiff"];
-  let currentUser = null;
   let messages = JSON.parse(localStorage.getItem('messages')) || [];
+  let currentUser = localStorage.getItem('currentUser');
 
-  loginForm.addEventListener('submit', (e) => {
+  function saveMessages() {
+    localStorage.setItem('messages', JSON.stringify(messages));
+  }
+
+  function loadMessages() {
+    messagesList.innerHTML = '';
+    messages.forEach(msg => {
+      const div = document.createElement('div');
+      div.className = `message-item ${msg.sender === "Tony" ? "message-tony" : "message-tiff"}`;
+      div.textContent = msg.content;
+      messagesList.appendChild(div);
+    });
+    messagesList.scrollTop = messagesList.scrollHeight;
+  }
+
+  if (currentUser) {
+    loginForm.classList.add('hidden');
+    messageBox.classList.remove('hidden');
+    loadMessages();
+  }
+
+  document.getElementById('login').addEventListener('submit', (e) => {
     e.preventDefault();
     const username = usernameInput.value.trim();
 
-    if (validUsers.includes(username)) {
+    if (username === "Tony" || username === "Tiff") {
+      localStorage.setItem('currentUser', username);
       currentUser = username;
+
       gsap.to(loginForm, { duration: 0.5, opacity: 0, y: -50 });
       setTimeout(() => {
         loginForm.classList.add('hidden');
@@ -28,16 +50,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 500);
       loadMessages();
     } else {
-      alert("Usuario no válido");
+      alert("Usuario incorrecto. Usa 'Tony' o 'Tiff'.");
     }
   });
 
   sendMessageButton.addEventListener('click', () => {
     const message = messageInput.value.trim();
-    if (message && currentUser) {
+    if (message) {
       messages.push({ content: message, sender: currentUser });
-      localStorage.setItem('messages', JSON.stringify(messages));
-      updateMessages();
+      saveMessages();
+      loadMessages();
       messageInput.value = '';
     }
   });
@@ -46,18 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
     messageInput.value = '';
   });
 
-  function updateMessages() {
-    messagesList.innerHTML = '';
-    messages.forEach((msg) => {
-      const div = document.createElement('div');
-      div.className = `message-item ${msg.sender === currentUser ? "sender" : ""}`;
-      div.textContent = `${msg.sender}: ${msg.content}`;
-      messagesList.appendChild(div);
-    });
-    messagesList.scrollTop = messagesList.scrollHeight;
-  }
-
-  function loadMessages() {
-    updateMessages();
-  }
+  window.addEventListener('storage', () => {
+    messages = JSON.parse(localStorage.getItem('messages')) || [];
+    loadMessages();
+  });
 });
