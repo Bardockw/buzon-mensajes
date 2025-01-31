@@ -1,30 +1,27 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Buzón de Mensajes</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
-  <div id="app">
-    <div class="login-screen">
-      <h1>Bienvenido</h1>
-      <p>Ingrese sus credenciales para acceder</p>
-      <input type="text" id="username" placeholder="Nombre">
-      <input type="password" id="password" placeholder="Contraseña">
-      <button id="login-button">Ingresar</button>
-      <p id="error-message" class="hidden">Credenciales incorrectas</p>
-    </div>
-
-    <div class="message-screen hidden">
-      <h1>Buzón de Mensajes</h1>
-      <textarea id="message-input" placeholder="Escribe tu mensaje aquí"></textarea>
-      <div class="buttons">
-        <button id="send-button">Enviar</button>
-        <button id="clear-button">Eliminar</button>
+  <div class="container">
+    <h1 class="title">Buzón de Mensajes</h1>
+    <form id="loginForm" class="form">
+      <input type="text" id="username" placeholder="Usuario" required>
+      <input type="password" id="password" placeholder="Contraseña" required>
+      <button type="submit">Ingresar</button>
+    </form>
+    <div id="messageBox" class="hidden">
+      <textarea id="messageInput" placeholder="Escribe tu mensaje aquí..."></textarea>
+      <div class="actions">
+        <button id="sendMessage">Enviar</button>
+        <button id="clearMessage">Borrar</button>
       </div>
-      <div id="messages-container"></div>
+      <ul id="messagesList"></ul>
     </div>
   </div>
   <script src="script.js"></script>
